@@ -8,11 +8,47 @@ import { connectDB, Project, ActivityLog } from "@/lib/db";
  * PUT    /api/projects/[id] — update nama/deskripsi/status/tags
  * DELETE /api/projects/[id] — soft delete (deletedAt)
  * ------------------------------------------------------- */
+const interfaceSchema = z.object({
+  name: z.string().trim().min(1).max(30),
+  ip: z.string().trim().max(40).optional().default(""),
+  vlan: z.number().int().min(1).max(4094).nullable().optional(),
+});
+
+const topologySchema = z.object({
+  nodes: z
+    .array(
+      z.object({
+        id: z.string().min(1).max(60),
+        type: z.enum(["router", "switch", "server", "pc", "laptop", "ap", "firewall", "cloud", "printer"]),
+        vendor: z.enum(["mikrotik", "cisco", "linux", "generic"]),
+        position: z.object({ x: z.number(), y: z.number() }),
+        properties: z.object({
+          hostname: z.string().trim().min(1).max(60),
+          interfaces: z.array(interfaceSchema).max(24),
+        }),
+      })
+    )
+    .max(200),
+  edges: z
+    .array(
+      z.object({
+        id: z.string().min(1).max(60),
+        source: z.string().min(1).max(60),
+        target: z.string().min(1).max(60),
+        sourceInterface: z.string().max(30).optional(),
+        targetInterface: z.string().max(30).optional(),
+        linkType: z.enum(["ethernet", "fiber", "wireless"]).optional(),
+      })
+    )
+    .max(400),
+});
+
 const updateSchema = z.object({
   name: z.string().trim().min(2, "Nama minimal 2 karakter").max(150).optional(),
   description: z.string().trim().max(1000).optional(),
   status: z.enum(["draft", "completed", "shared"]).optional(),
   tags: z.array(z.string().trim().min(1).max(30)).max(10).optional(),
+  topology: topologySchema.optional(),
 });
 
 type Ctx = { params: Promise<{ id: string }> };

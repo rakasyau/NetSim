@@ -15,6 +15,7 @@ const InterfaceSchema = new Schema(
 
 /* ---------------------------------------------------------
  * Sub-schema: Node (perangkat) dalam topologi
+ * Format: PRD §7.2 — properties nested (hostname + interfaces)
  * ------------------------------------------------------- */
 const NodeSchema = new Schema(
   {
@@ -29,14 +30,14 @@ const NodeSchema = new Schema(
       required: true,
       enum: ['mikrotik', 'cisco', 'linux', 'generic'],
     },
-    hostname: { type: String, required: true, trim: true },
-    osVersion: { type: String, default: '' }, // contoh: RouterOS 7.15, IOS 15.2, Ubuntu 24.04
     position: {
       x: { type: Number, required: true },
       y: { type: Number, required: true },
     },
-    interfaces: { type: [InterfaceSchema], default: [] },
-    notes: { type: String, default: '' },
+    properties: {
+      hostname: { type: String, required: true, trim: true },
+      interfaces: { type: [InterfaceSchema], default: [] },
+    },
   },
   { _id: false }
 );
@@ -181,13 +182,15 @@ ProjectSchema.methods.findDuplicateIPs = function () {
   const duplicates: { ip: string; nodes: string[] }[] = [];
 
   this.topology.nodes.forEach((node: any) => {
-    node.interfaces.forEach((iface: any) => {
+    const interfaces = node.properties?.interfaces ?? [];
+    const hostname = node.properties?.hostname ?? node.id;
+    interfaces.forEach((iface: any) => {
       if (!iface.ip) return;
       const baseIp = String(iface.ip).split('/')[0];
       if (ipMap.has(baseIp)) {
-        duplicates.push({ ip: baseIp, nodes: [ipMap.get(baseIp)!, node.hostname] });
+        duplicates.push({ ip: baseIp, nodes: [ipMap.get(baseIp)!, hostname] });
       } else {
-        ipMap.set(baseIp, node.hostname);
+        ipMap.set(baseIp, hostname);
       }
     });
   });
