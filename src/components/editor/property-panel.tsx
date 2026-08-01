@@ -6,6 +6,7 @@
  * ------------------------------------------------------- */
 import { deviceInfo } from "@/lib/device-catalog";
 import { useEditorStore } from "@/components/editor/editor-store";
+import { Icon } from "@/components/icons";
 import type { FlowNode, StoredInterface } from "@/lib/topology-types";
 
 const VENDOR_LABEL: Record<string, string> = {
@@ -15,7 +16,7 @@ const VENDOR_LABEL: Record<string, string> = {
   generic: "Generic",
 };
 
-export function PropertyPanel() {
+export function PropertyPanel({ onOpenConfig }: { onOpenConfig?: () => void }) {
   const nodes = useEditorStore((s) => s.nodes);
   const edges = useEditorStore((s) => s.edges);
   const selectedNodeId = useEditorStore((s) => s.selectedNodeId);
@@ -50,6 +51,7 @@ export function PropertyPanel() {
       edges={edges}
       onUpdate={(patch) => updateNodeData(node.id, patch)}
       onDelete={removeSelected}
+      onOpenConfig={onOpenConfig}
     />
   );
 }
@@ -61,12 +63,14 @@ function NodeEditorForm({
   edges,
   onUpdate,
   onDelete,
+  onOpenConfig,
 }: {
   node: FlowNode;
   nodes: FlowNode[];
   edges: { source: string; target: string; sourceInterface?: string | null }[];
   onUpdate: (patch: Partial<FlowNode["data"]>) => void;
   onDelete: () => void;
+  onOpenConfig?: () => void;
 }) {
   const info = deviceInfo(node.data.type);
   const mgmtIp = node.data.interfaces.find((i) => i.ip)?.ip ?? "";
@@ -186,7 +190,11 @@ function NodeEditorForm({
 
       {/* Footer */}
       <div className="p-4 border-t border-border-muted bg-container">
-        <button className="w-full bg-surface-2 border border-border-muted text-primary py-2 rounded hover:bg-high transition-colors font-semibold text-[13px] cursor-pointer">
+        <button
+          onClick={onOpenConfig}
+          className="w-full bg-surface-2 border border-border-muted text-primary py-2 rounded hover:bg-high hover:border-neon transition-colors font-semibold text-[13px] cursor-pointer flex items-center justify-center gap-2"
+        >
+          <Icon name="terminal" size={15} />
           Buka Terminal CLI
         </button>
       </div>

@@ -10,9 +10,10 @@ import { toPng } from "html-to-image";
 import { Toolbelt } from "@/components/editor/toolbelt";
 import { TopologyCanvas } from "@/components/editor/topology-canvas";
 import { PropertyPanel } from "@/components/editor/property-panel";
+import { ConfigEditor } from "@/components/editor/config-editor";
 import { AiPanel } from "@/components/editor/ai-panel";
 import { useEditorStore } from "@/components/editor/editor-store";
-import { toFlow, type FlowEdge, type FlowNode } from "@/lib/topology-types";
+import { toFlow, toStored, type FlowEdge, type FlowNode } from "@/lib/topology-types";
 import { Icon } from "@/components/icons";
 
 type ProjectData = {
@@ -27,10 +28,14 @@ export function EditorClient({ project }: { project: ProjectData }) {
   const undo = useEditorStore((s) => s.undo);
   const redo = useEditorStore((s) => s.redo);
   const [exporting, setExporting] = useState(false);
+  const [exportOpen, setExportOpen] = useState(false);
   const [aiOpen, setAiOpen] = useState(false);
   const [aiMode, setAiMode] = useState<"chat" | "topology" | "config">("chat");
+  const [rightTab, setRightTab] = useState<"props" | "config">("props");
   const [zoomPct, setZoomPct] = useState(100);
   const canvasRef = useRef<HTMLDivElement>(null);
+  const nodesStore = useEditorStore((s) => s.nodes);
+  const edgesStore = useEditorStore((s) => s.edges);
 
   const openAi = (mode: "chat" | "topology" | "config") => {
     setAiMode(mode);
@@ -68,6 +73,7 @@ export function EditorClient({ project }: { project: ProjectData }) {
     const el = canvasRef.current?.querySelector(".react-flow") as HTMLElement | null;
     if (!el) return;
     setExporting(true);
+    setExportOpen(false);
     try {
       const dataUrl = await toPng(el, {
         backgroundColor: "#0B0E11",
@@ -82,6 +88,39 @@ export function EditorClient({ project }: { project: ProjectData }) {
       a.click();
     } catch (e) {
       console.error("Export PNG gagal:", e);
+    } finally {
+      setExporting(false);
+    }
+  }
+
+  function exportJson() {
+    setExportOpen(false);
+    const stored = toStored(nodesStore as FlowNode[], edgesStore as FlowEdge[]);
+    const blob = new Blob(
+      [JSON.stringify({ name: project.name, exportedAt: new Date().toISOString(), topology: stored }, null, 2)],
+      { type: "application/json" }
+    );
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = `${project.name || "topologi"}.json`;
+    a.click();
+    URL.revokeObjectURL(a.href);
+  }
+
+  async function exportZip() {
+    setExporting(true);
+    setExportOpen(false);
+    try {
+      const res = await fetch(`/api/projects/${project.id}/export`);
+      if (!res.ok) throw new Error("Gagal export ZIP");
+      const blob = await res.blob();
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = `${project.name || "topologi"}.zip`;
+      a.click();
+      URL.revokeObjectURL(a.href);
+    } catch (e) {
+      console.error("Export ZIP gagal:", e);
     } finally {
       setExporting(false);
     }
@@ -128,14 +167,43 @@ export function EditorClient({ project }: { project: ProjectData }) {
             </span>
           )}
 
-          <button
-            onClick={exportPng}
-            disabled={exporting}
-            className="hidden md:inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg bg-surface-2 border border-border-muted text-[12px] text-primary hover:border-neon transition-colors cursor-pointer disabled:opacity-50"
-          >
-            <Icon name="download" size={15} />
-            {exporting ? "Mengekspor..." : "Export PNG"}
-          </button>
+          {/* Export dropdown */}
+          <div className="relative hidden md:block">
+            <button
+              onClick={() => setExportOpen((v) => !v)}
+              disabled={exporting}
+              className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg bg-surface-2 border border-border-muted text-[12px] text-primary hover:border-neon transition-colors cursor-pointer disabled:opacity-50"
+            >
+              <Icon name="download" size={15} />
+              {exporting ? "Mengekspor..." : "Export"}
+              <Icon name={exportOpen ? "expandL" : "chevR"} size={12} className="text-dim" />
+            </button>
+            {exportOpen && (
+              <div className="absolute right-0 top-full mt-1.5 z-40 card-dark w-[200px] p-1.5 shadow-xl">
+                <button
+                  onClick={() => void exportPng()}
+                  className="w-full flex items-center gap-2.5 text-left text-[12.5px] px-3 py-2 rounded-lg hover:bg-high text-primary cursor-pointer"
+                >
+                  <Icon name="image" size={15} className="text-secondary" />
+                  Export PNG (topologi)
+                </button>
+                <button
+                  onClick={() => void exportZip()}
+                  className="w-full flex items-center gap-2.5 text-left text-[12.5px] px-3 py-2 rounded-lg hover:bg-high text-primary cursor-pointer"
+                >
+                  <Icon name="folder" size={15} className="text-secondary" />
+                  Export ZIP (config)
+                </button>
+                <button
+                  onClick={exportJson}
+                  className="w-full flex items-center gap-2.5 text-left text-[12.5px] px-3 py-2 rounded-lg hover:bg-high text-primary cursor-pointer"
+                >
+                  <Icon name="dns" size={15} className="text-secondary" />
+                  Export JSON (topologi)
+                </button>
+              </div>
+            )}
+          </div>
           <button
             title="Bantuan"
             className="w-8 h-8 flex items-center justify-center rounded-full text-secondary hover:text-neon hover:bg-high transition-colors cursor-pointer"
@@ -266,10 +334,32 @@ export function EditorClient({ project }: { project: ProjectData }) {
           </div>
         </main>
 
-        {/* ---------- Properties panel (kanan) ---------- */}
-        <aside className="w-[330px] shrink-0 bg-surface border-l border-border-muted flex flex-col z-20 shadow-[-4px_0_15px_rgba(0,0,0,0.2)]">
+        {/* ---------- Properties/Config panel (kanan) ---------- */}
+        <aside className="w-[340px] shrink-0 bg-surface border-l border-border-muted flex flex-col z-20 shadow-[-4px_0_15px_rgba(0,0,0,0.2)]">
           <div className="h-12 border-b border-border-muted flex items-center justify-between px-4 flex-shrink-0">
-            <span className="text-[20px] font-semibold text-primary">Properties</span>
+            <div className="flex items-center gap-1 bg-surface-2 border border-border-muted rounded-lg p-0.5">
+              <button
+                onClick={() => setRightTab("props")}
+                className={`px-3 py-1 rounded-md text-[12.5px] font-semibold cursor-pointer transition-colors ${
+                  rightTab === "props"
+                    ? "bg-neon text-on-neon"
+                    : "text-secondary hover:text-primary"
+                }`}
+              >
+                Properti
+              </button>
+              <button
+                onClick={() => setRightTab("config")}
+                className={`px-3 py-1 rounded-md text-[12.5px] font-semibold cursor-pointer transition-colors flex items-center gap-1.5 ${
+                  rightTab === "config"
+                    ? "bg-neon text-on-neon"
+                    : "text-secondary hover:text-primary"
+                }`}
+              >
+                <Icon name="terminal" size={13} />
+                Config
+              </button>
+            </div>
             <button
               onClick={() => openAi("chat")}
               title="Buka AI Assistant"
@@ -278,7 +368,11 @@ export function EditorClient({ project }: { project: ProjectData }) {
               <Icon name="smartToy" size={20} />
             </button>
           </div>
-          <PropertyPanel />
+          {rightTab === "props" ? (
+            <PropertyPanel onOpenConfig={() => setRightTab("config")} />
+          ) : (
+            <ConfigEditor projectId={project.id} />
+          )}
         </aside>
       </div>
 
