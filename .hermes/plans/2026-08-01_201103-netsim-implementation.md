@@ -21,7 +21,7 @@
 
 1. **Kredensial — SUDAH TERVERIFIKASI (1 Agu 2026)**: `KEY.txt` berisi MONGODB_URI & GEMINI_API_KEY yang valid & lengkap. Uji langsung: MongoDB ping OK (cluster punya DB `kampus_blog`, `netmind_db`, dll); Gemini auth OK (50 model). Tampilan `***` di read_file hanyalah masking Hermes — isi file asli lengkap.
 2. **.env & .gitignore**: wajib dibuat di Fase 0; `KEY.txt` dan `.env*` tidak boleh masuk git.
-3. **Model Gemini — TERVERIFIKASI**: `gemini-3.6-flash` di PRD TIDAK ADA di akun. Pakai **`gemini-2.5-flash`** (flash terbaru yang tersedia; `gemini-flash-latest` juga oke).
+3. **Model Gemini — TERVERIFIKASI (update 1 Agu 2026)**: `gemini-3.6-flash` (di PRD) SEKARANG SUDAH TERSEDIA di akun — terverifikasi via API (list models). Pakai **`gemini-3.6-flash`** sesuai PRD. (Sebelumnya sempat tidak ada — saat itu fallback ke `gemini-2.5-flash`; sekarang sudah muncul di daftar model.)
 4. **UI Bahasa Indonesia** untuk semua teks antarmuka (kode/props tetap Inggris).
 
 ## ✅ Keputusan User (1 Agu 2026)
@@ -144,7 +144,7 @@
 **Objektif:** Chat AI 3 mode berfungsi end-to-end (generate topology, generate config, tanya jawab) — implementasi `bahan/gemini_prompt_engineering.md`.
 
 **Files:**
-- Create: `src/lib/gemini.ts` (client server-side: panggil `generateContent`, parse JSON, error handling; **model: `gemini-2.5-flash`** — sudah diverifikasi ada di akun, `gemini-3.6-flash` tidak tersedia)
+- Create: `src/lib/gemini.ts` (client server-side: panggil `generateContent`, parse JSON, error handling; **model: `gemini-3.6-flash`** — sesuai PRD, sudah diverifikasi tersedia di akun)
 - Create: `src/lib/prompts/topology.ts`, `src/lib/prompts/config.ts`, `src/lib/prompts/explain.ts` (tiga system prompt, salin dari `gemini_prompt_engineering.md` §2–4)
 - Create: `src/app/api/ai/generate-topology/route.ts` (Mode 1: prompt → JSON topology → validasi server → return)
 - Create: `src/app/api/ai/generate-config/route.ts` (Mode 2: kirim nodes+edges → config per node → linting)
@@ -236,7 +236,7 @@ Fase 3 & 4 bisa dijalankan berurutan ketat (AI butuh canvas untuk preview); Fase
 
 | Risiko | Mitigasi |
 |---|---|
-| Model `gemini-3.6-flash` (PRD) tidak tersedia | ✅ Teratasi: pakai `gemini-2.5-flash` (terverifikasi via API) |
+| Model `gemini-3.6-flash` (PRD) | ✅ Teratasi: tersedia di akun, terverifikasi via API |
 | AI output config salah sintaks | Linting server + badge "Perlu Ditinjau" (sudah di plan) |
 | Biaya API membengkak | Rate limit 20/user/hari + cache prompt identik |
 | Canvas lambat di topologi besar | Batasi node MVP (~100), React Flow sudah optimized |
