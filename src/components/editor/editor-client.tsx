@@ -10,6 +10,7 @@ import { toPng } from "html-to-image";
 import { Toolbelt } from "@/components/editor/toolbelt";
 import { TopologyCanvas } from "@/components/editor/topology-canvas";
 import { PropertyPanel } from "@/components/editor/property-panel";
+import { AiPanel } from "@/components/editor/ai-panel";
 import { useEditorStore } from "@/components/editor/editor-store";
 import { toFlow, type FlowEdge, type FlowNode } from "@/lib/topology-types";
 import { Icon } from "@/components/icons";
@@ -27,8 +28,14 @@ export function EditorClient({ project }: { project: ProjectData }) {
   const redo = useEditorStore((s) => s.redo);
   const [exporting, setExporting] = useState(false);
   const [aiOpen, setAiOpen] = useState(false);
+  const [aiMode, setAiMode] = useState<"chat" | "topology" | "config">("chat");
   const [zoomPct, setZoomPct] = useState(100);
   const canvasRef = useRef<HTMLDivElement>(null);
+
+  const openAi = (mode: "chat" | "topology" | "config") => {
+    setAiMode(mode);
+    setAiOpen(true);
+  };
 
   // Load topology sekali saat mount
   const initialized = useRef(false);
@@ -171,7 +178,7 @@ export function EditorClient({ project }: { project: ProjectData }) {
             <Icon name="schema" size={20} />
           </span>
           <button
-            onClick={() => setAiOpen(true)}
+            onClick={() => openAi("chat")}
             title="AI Assistant"
             className="text-secondary hover:text-neon hover:bg-high p-2 rounded-lg transition-colors cursor-pointer"
           >
@@ -241,7 +248,7 @@ export function EditorClient({ project }: { project: ProjectData }) {
             </div>
 
             <button
-              onClick={() => setAiOpen(true)}
+              onClick={() => openAi("config")}
               className="flex items-center gap-2 bg-surface-2 border border-neon text-neon px-3.5 py-1.5 rounded-lg text-[13px] font-semibold hover:bg-neon hover:text-on-neon transition-colors cursor-pointer"
             >
               <Icon name="sparkle" size={15} />
@@ -264,7 +271,7 @@ export function EditorClient({ project }: { project: ProjectData }) {
           <div className="h-12 border-b border-border-muted flex items-center justify-between px-4 flex-shrink-0">
             <span className="text-[20px] font-semibold text-primary">Properties</span>
             <button
-              onClick={() => setAiOpen(true)}
+              onClick={() => openAi("chat")}
               title="Buka AI Assistant"
               className="text-secondary hover:text-neon transition-colors cursor-pointer"
             >
@@ -276,79 +283,14 @@ export function EditorClient({ project }: { project: ProjectData }) {
       </div>
 
       {/* ---------- AI Assistant overlay (mockup preview) ---------- */}
-      {aiOpen && <AiOverlay onClose={() => setAiOpen(false)} projectName={project.name} />}
-    </div>
-  );
-}
-
-/* Panel AI — placeholder CyberNet (fungsional di Fase 4) */
-function AiOverlay({ onClose, projectName }: { onClose: () => void; projectName: string }) {
-  return (
-    <div className="fixed inset-0 z-50 flex justify-end bg-black/50 backdrop-blur-[2px]">
-      <div className="w-[450px] h-full bg-surface/90 glass-panel border-l border-border-muted rounded-l-xl flex flex-col shadow-2xl animate-in">
-        {/* Header */}
-        <div className="h-14 border-b border-border-muted flex items-center justify-between px-4 flex-shrink-0 bg-surface-2/50">
-          <div className="flex items-center gap-2">
-            <span className="text-neon">
-              <Icon name="smartToy" size={20} />
-            </span>
-            <h2 className="text-[20px] font-semibold text-primary">NetSim AI</h2>
-          </div>
-          <button
-            onClick={onClose}
-            className="text-secondary hover:text-primary transition-colors cursor-pointer"
-          >
-            <Icon name="close" size={20} />
-          </button>
-        </div>
-
-        {/* Status project */}
-        <div className="px-4 py-3 border-b border-border-muted flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full bg-neon animate-pulse" />
-          <span className="label-caps text-secondary truncate">{projectName}</span>
-        </div>
-
-        {/* Chat area */}
-        <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-6">
-          <div className="flex gap-3">
-            <div className="w-8 h-8 rounded bg-surface-2 border border-neon/30 flex items-center justify-center flex-shrink-0 mt-1 text-neon">
-              <Icon name="smartToy" size={16} />
-            </div>
-            <div className="flex-1 flex flex-col gap-3">
-              <div className="text-[14px] text-primary bg-surface-2 p-3 rounded-lg rounded-tl-none border border-border-muted">
-                Halo! Saya asisten AI NetSim. Aku bisa membantu membuat topologi dan
-                generate konfigurasi perangkat. Fitur ini aktif di Fase 4 — bersiaplah! ✨
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Input area */}
-        <div className="p-4 border-t border-border-muted bg-surface/80 flex-shrink-0 flex flex-col gap-3">
-          <div className="flex flex-wrap gap-2">
-            <button
-              disabled
-              className="px-3 py-1.5 rounded-full bg-surface-2 border border-border-muted text-[13px] text-primary disabled:opacity-50 cursor-not-allowed"
-            >
-              ⏳ Segera hadir
-            </button>
-          </div>
-          <div className="relative mt-1">
-            <textarea
-              disabled
-              placeholder="Tanya AI..."
-              rows={2}
-              className="w-full bg-bg border border-border-muted rounded-lg pl-3 pr-12 py-2 text-[14px] text-primary focus:outline-none focus:border-neon focus:ring-1 focus:ring-neon/50 resize-none placeholder:text-dim disabled:opacity-60"
-            />
-            <button
-              disabled
-              className="absolute right-2 bottom-2 w-8 h-8 rounded bg-neon text-on-neon flex items-center justify-center disabled:opacity-50"
-            >
-              <Icon name="send" size={18} />
-            </button>
-          </div>
-        </div>
-      </div>
+      {aiOpen && (
+        <AiPanel
+          projectId={project.id}
+          projectName={project.name}
+          initialMode={aiMode}
+          onClose={() => setAiOpen(false)}
+        />
+      )}
     </div>
   );
 }

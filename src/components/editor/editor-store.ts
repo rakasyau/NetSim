@@ -27,6 +27,7 @@ type EditorStore = {
   onEdgesChange: (changes: EdgeChange<FlowEdge>[]) => void;
   addNode: (node: FlowNode) => void;
   addEdge: (edge: FlowEdge) => void;
+  applyTopology: (nodes: FlowNode[], edges: FlowEdge[]) => void;
   removeSelected: () => void;
   updateNodeData: (nodeId: string, patch: Partial<FlowNode["data"]>) => void;
   selectNode: (nodeId: string | null) => void;
@@ -76,6 +77,12 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
   addEdge: (edge) => {
     get().pushHistory();
     set((s) => ({ edges: [...s.edges, edge], saveState: "dirty" }));
+  },
+
+  /* Terapkan hasil AI (topologi) — satu langkah undo, replace seluruh nodes/edges */
+  applyTopology: (nodes, edges) => {
+    get().pushHistory();
+    set({ nodes, edges, selectedNodeId: null, saveState: "dirty" });
   },
 
   removeSelected: () => {
