@@ -78,7 +78,7 @@ export default function RegisterPage() {
             type="text"
             required
             className="input-dark"
-            placeholder="Raka Syauqi"
+            placeholder="Agus Gokil"
             value={name}
             onChange={(e) => setName(e.target.value)}
           />

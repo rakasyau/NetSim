@@ -10,7 +10,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Icon } from "@/components/icons";
 import { useEditorStore } from "@/components/editor/editor-store";
-import { deviceInfo } from "@/lib/device-catalog";
 import type { FlowEdge, FlowNode } from "@/lib/topology-types";
 
 type Mode = "chat" | "topology" | "config";
@@ -221,12 +220,17 @@ function TopologyMode({ projectId, onClose }: { projectId: string; onClose: () =
   } | null>(null);
   const [remaining, setRemaining] = useState<number | null>(null);
 
+  const [applied, setApplied] = useState(false);
+  const [appliedSummary, setAppliedSummary] = useState<{ nodes: number; edges: number } | null>(null);
+
   async function generate() {
     const text = prompt.trim();
     if (!text || loading) return;
     setLoading(true);
     setError(null);
     setPreview(null);
+    setApplied(false);
+    setAppliedSummary(null);
     try {
       const res = await fetch("/api/ai/generate-topology", {
         method: "POST",
@@ -240,8 +244,7 @@ function TopologyMode({ projectId, onClose }: { projectId: string; onClose: () =
         setError(data.error ?? "AI tidak menghasilkan topologi. Coba deskripsi lebih jelas.");
         return;
       }
-      setPreview({
-        nodes: data.nodes.map((n: Record<string, unknown>, i: number) => ({
+      const nodes = data.nodes.map((n: Record<string, unknown>, i: number) => ({
           id: String(n.id),
           type: "device",
           position: n.position as { x: number; y: number },
@@ -252,27 +255,25 @@ function TopologyMode({ projectId, onClose }: { projectId: string; onClose: () =
             model: "",
             interfaces: (n.properties as { interfaces: unknown[] }).interfaces as never[],
           },
-        })) as FlowNode[],
-        edges: (data.edges ?? []).map((e: Record<string, unknown>) => ({
+        })) as FlowNode[];
+      const edges = (data.edges ?? []).map((e: Record<string, unknown>) => ({
           id: String(e.id),
           source: String(e.source),
           target: String(e.target),
           sourceHandle: `source-${String(e.sourceInterface ?? "")}`,
           targetHandle: `target-${String(e.targetInterface ?? "")}`,
           style: { stroke: "#4A5468", strokeWidth: 2 },
-        })) as FlowEdge[],
-      });
+        })) as FlowEdge[];
+      // Auto-apply ke canvas
+      applyTopology(nodes, edges);
+      setAppliedSummary({ nodes: nodes.length, edges: edges.length });
+      setApplied(true);
+      setTimeout(() => onClose(), 1200);
     } catch (e) {
       setError((e as Error).message);
     } finally {
       setLoading(false);
     }
-  }
-
-  function apply() {
-    if (!preview) return;
-    applyTopology(preview.nodes, preview.edges);
-    onClose();
   }
 
   return (
@@ -313,48 +314,17 @@ function TopologyMode({ projectId, onClose }: { projectId: string; onClose: () =
           </div>
         )}
 
-        {preview && (
-          <div className="border border-neon/40 rounded-lg overflow-hidden">
-            <div className="px-3 py-2 bg-neon/10 border-b border-neon/30 flex items-center justify-between">
-              <span className="text-[12px] font-bold text-neon">
-                Preview — {preview.nodes.length} perangkat, {preview.edges.length} kabel
-              </span>
+        {applied && appliedSummary && (
+          <div className="text-center py-8 flex flex-col items-center gap-3">
+            <div className="w-12 h-12 rounded-full bg-neon/20 border border-neon/40 flex items-center justify-center text-neon">
+              <Icon name="check" size={24} />
             </div>
-            <div className="p-3 flex flex-col gap-1.5 bg-surface">
-              {preview.nodes.map((n) => {
-                const info = deviceInfo(n.data.type as never);
-                return (
-                  <div key={n.id} className="flex items-center gap-2.5 text-[12.5px]">
-                    <span
-                      className="w-6 h-6 rounded flex items-center justify-center text-[10px] font-bold flex-shrink-0"
-                      style={{ background: `${info.color}24`, color: info.color }}
-                    >
-                      {info.icon}
-                    </span>
-                    <span className="font-semibold text-primary">{n.data.hostname}</span>
-                    <span className="text-dim text-[11px]">{info.label}</span>
-                    <span className="ml-auto text-dim font-mono text-[11px]">
-                      {n.data.interfaces.filter((i) => (i as { ip?: string }).ip).length} IP
-                    </span>
-                  </div>
-                );
-              })}
-              {preview.note && (
-                <p className="text-[11.5px] text-amber-400 mt-1">{preview.note}</p>
-              )}
-            </div>
-            <div className="p-3 border-t border-border-muted bg-surface-2 flex gap-2">
-              <button onClick={apply} className="btn-accent flex-1 !py-2 text-[12.5px]">
-                <Icon name="check" size={15} />
-                Terapkan ke Canvas
-              </button>
-              <button
-                onClick={() => setPreview(null)}
-                className="btn-dark !py-2 text-[12.5px]"
-              >
-                Tolak
-              </button>
-            </div>
+            <p className="text-[14px] font-semibold text-primary">
+              {appliedSummary.nodes} perangkat &middot; {appliedSummary.edges} kabel
+            </p>
+            <p className="text-[12.5px] text-secondary">
+              Topologi berhasil diterapkan ke canvas!
+            </p>
           </div>
         )}
       </div>
@@ -478,7 +448,7 @@ function ConfigMode({
               />
             </button>
             {expanded === c.nodeId && (
-              <div className="border-t border-border-muted bg-[#1E2329]">
+              <div className="border-t border-border-muted bg-surface-2">
                 {c.issues.length > 0 && (
                   <div className="px-3 py-2 bg-amber-500/10 border-b border-amber-500/20 text-[11px] text-amber-400">
                     ⚠ {c.issues.join(" · ")}

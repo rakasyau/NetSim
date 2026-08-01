@@ -13,7 +13,7 @@ type NavKey = "dashboard" | "projects" | "template" | "ai" | "settings";
 const NAV: { key: NavKey; label: string; icon: string; href: string }[] = [
   { key: "dashboard", label: "Dashboard", icon: "dashboard", href: "/dashboard" },
   { key: "projects", label: "Proyek Saya", icon: "folder", href: "/dashboard/projects" },
-  { key: "template", label: "Template", icon: "schema", href: "/dashboard/new" },
+  { key: "template", label: "Buat Proyek", icon: "schema", href: "/dashboard/new" },
   { key: "ai", label: "AI Assistant", icon: "smartToy", href: "/dashboard" },
   { key: "settings", label: "Pengaturan", icon: "settings", href: "/dashboard/settings" },
 ];

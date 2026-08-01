@@ -10,8 +10,7 @@ export function NewProjectClient() {
     <CreateProjectDialog
       open
       onClose={() => {
-        router.push("/dashboard");
-        router.refresh();
+        router.back();
       }}
     />
   );

@@ -159,7 +159,7 @@ export function ConfigEditor({ projectId }: { projectId: string }) {
             spellCheck={false}
             placeholder={`# Script ${node?.data.vendor === "mikrotik" ? "RouterOS" : node?.data.vendor === "cisco" ? "Cisco IOS" : "netplan/Linux"}\n# Ctrl+Enter untuk menyimpan`}
             rows={16}
-            className="w-full bg-[#1E2329] border border-border-muted rounded-lg px-3 py-2.5 font-mono text-[12px] text-primary leading-relaxed focus:outline-none focus:border-neon focus:ring-1 focus:ring-neon/50 resize-y placeholder:text-dim"
+            className="w-full bg-surface-2 border border-border-muted rounded-lg px-3 py-2.5 font-mono text-[12px] text-primary leading-relaxed focus:outline-none focus:border-neon focus:ring-1 focus:ring-neon/50 resize-y placeholder:text-dim"
           />
         </div>
 
