@@ -5,27 +5,58 @@ import { connectDB, Project, ActivityLog } from "@/lib/db";
 
 /* ---------------------------------------------------------
  * GET  /api/projects — daftar proyek milik user (aktif)
+ *      Query: ?search=&status=&tag=&sort=&limit=&offset=
  * POST /api/projects — buat proyek baru
- * (CRUD lengkap: GET one / PUT / DELETE / duplicate → Fase 2)
  * ------------------------------------------------------- */
 const createSchema = z.object({
   name: z.string().trim().min(2, "Nama minimal 2 karakter").max(150),
   description: z.string().trim().max(1000).optional().default(""),
 });
 
-export async function GET() {
+export async function GET(req: Request) {
   const session = await auth();
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
+  const { searchParams } = new URL(req.url);
+  const search = searchParams.get("search")?.trim() ?? "";
+  const status = searchParams.get("status")?.trim() ?? "";
+  const tag = searchParams.get("tag")?.trim() ?? "";
+  const sort = searchParams.get("sort") ?? "updatedAt";
+  const limit = Math.min(Number(searchParams.get("limit")) || 50, 100);
+  const offset = Math.max(Number(searchParams.get("offset")) || 0, 0);
+
   await connectDB();
-  const projects = await Project.find({
+
+  // Filter dasar: milik user & tidak terhapus
+  const filter: Record<string, unknown> = {
     ownerId: session.user.id,
     deletedAt: null,
-  })
-    .sort({ updatedAt: -1 })
-    .select("name description status tags topology.nodes updatedAt createdAt");
+  };
+
+  if (status && ["draft", "completed", "shared"].includes(status)) {
+    filter.status = status;
+  }
+  if (tag) {
+    filter.tags = tag;
+  }
+  if (search) {
+    // text index: name & description
+    filter.$text = { $search: search };
+  }
+
+  const sortField: Record<string, 1 | -1> =
+    sort === "name" ? { name: 1 } : sort === "createdAt" ? { createdAt: -1 } : { updatedAt: -1 };
+
+  const [projects, total] = await Promise.all([
+    Project.find(filter)
+      .sort(sortField)
+      .skip(offset)
+      .limit(limit)
+      .select("name description status tags topology.nodes updatedAt createdAt"),
+    Project.countDocuments(filter),
+  ]);
 
   return NextResponse.json({
     projects: projects.map((p) => ({
@@ -38,6 +69,7 @@ export async function GET() {
       updatedAt: p.updatedAt,
       createdAt: p.createdAt,
     })),
+    total,
   });
 }
 

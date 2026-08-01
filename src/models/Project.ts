@@ -166,7 +166,10 @@ const ProjectSchema = new Schema(
 ProjectSchema.index({ ownerId: 1, updatedAt: -1 }); // dashboard: list proyek terbaru milik user
 ProjectSchema.index({ name: 'text', description: 'text' }); // pencarian proyek (text)
 ProjectSchema.index({ tags: 1 }); // filter tag (array → index biasa, bukan text)
-ProjectSchema.index({ publicShareToken: 1 }, { unique: true, sparse: true });
+ProjectSchema.index(
+  { publicShareToken: 1 },
+  { unique: true, partialFilterExpression: { publicShareToken: { $type: 'string' } } }
+);
 
 /* ---------------------------------------------------------
  * Method bantu
@@ -210,14 +213,41 @@ ProjectSchema.methods.softDelete = function () {
   this.deletedAt = new Date();
 };
 
+// Duplikat proyek (tanpa versi & riwayat chat, reset status ke draft)
+ProjectSchema.methods.duplicate = function () {
+  const clone = {
+    ownerId: this.ownerId,
+    name: `${this.name} (Salinan)`,
+    description: this.description,
+    status: 'draft',
+    thumbnailUrl: '',
+    topology: this.topology,
+    configs: this.configs,
+    aiChatHistory: [],
+    versions: [],
+    collaborators: [],
+    isPublic: false,
+    publicShareToken: null,
+    tags: this.tags,
+    deletedAt: null,
+  };
+  return clone;
+};
+
 export type ProjectType = InferSchemaType<typeof ProjectSchema>;
 
-export type ProjectModel = Model<ProjectType> & {
-  // methods tambahan (di-declare agar TS aware)
-};
+// Dokumen hasil query — signature method custom
+export interface ProjectDoc extends ProjectType {
+  findDuplicateIPs(): { ip: string; nodes: string[] }[];
+  createVersionSnapshot(label: string, userId: any): void;
+  softDelete(): void;
+  duplicate(): Record<string, unknown>;
+}
+
+export type ProjectModel = Model<ProjectDoc>;
 
 const Project =
   (mongoose.models.Project as ProjectModel | undefined) ||
-  mongoose.model<ProjectType, ProjectModel>('Project', ProjectSchema);
+  mongoose.model<ProjectDoc, ProjectModel>('Project', ProjectSchema);
 
 export default Project;
