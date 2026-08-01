@@ -164,7 +164,8 @@ const ProjectSchema = new Schema(
  * Index
  * ------------------------------------------------------- */
 ProjectSchema.index({ ownerId: 1, updatedAt: -1 }); // dashboard: list proyek terbaru milik user
-ProjectSchema.index({ name: 'text', description: 'text', tags: 1 }); // pencarian proyek
+ProjectSchema.index({ name: 'text', description: 'text' }); // pencarian proyek (text)
+ProjectSchema.index({ tags: 1 }); // filter tag (array → index biasa, bukan text)
 ProjectSchema.index({ publicShareToken: 1 }, { unique: true, sparse: true });
 
 /* ---------------------------------------------------------

@@ -90,12 +90,15 @@ UserSchema.set('toJSON', {
 
 export type UserType = InferSchemaType<typeof UserSchema>;
 
-export type UserModel = Model<UserType> & {
-  // methods tambahan
-};
+// Dokumen hasil query — tambahkan signature method custom
+export interface UserDoc extends UserType {
+  comparePassword(plainPassword: string): Promise<boolean>;
+}
+
+export type UserModel = Model<UserDoc>;
 
 const User =
   (mongoose.models.User as UserModel | undefined) ||
-  mongoose.model<UserType, UserModel>('User', UserSchema);
+  mongoose.model<UserDoc, UserModel>('User', UserSchema);
 
 export default User;
