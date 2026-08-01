@@ -4,9 +4,10 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { StatusBadge } from "@/components/status-badge";
+import { Icon } from "@/components/icons";
 
 /* ---------------------------------------------------------
- * ProjectCard — kartu proyek di dashboard
+ * ProjectCard — kartu proyek di dashboard (CyberNet)
  * Aksi: buka editor, duplicate, hapus (soft delete), ubah status
  * ------------------------------------------------------- */
 type Project = {
@@ -27,9 +28,7 @@ export function ProjectCard({ project }: { project: Project }) {
   async function duplicate() {
     setBusy(true);
     const res = await fetch(`/api/projects/${project.id}/duplicate`, { method: "POST" });
-    if (res.ok) {
-      router.refresh();
-    }
+    if (res.ok) router.refresh();
     setBusy(false);
     setMenuOpen(false);
   }
@@ -38,9 +37,7 @@ export function ProjectCard({ project }: { project: Project }) {
     if (!confirm(`Hapus proyek "${project.name}"? (masih bisa dipulihkan selama 30 hari)`)) return;
     setBusy(true);
     const res = await fetch(`/api/projects/${project.id}`, { method: "DELETE" });
-    if (res.ok) {
-      router.refresh();
-    }
+    if (res.ok) router.refresh();
     setBusy(false);
     setMenuOpen(false);
   }
@@ -64,13 +61,20 @@ export function ProjectCard({ project }: { project: Project }) {
   });
 
   return (
-    <div className="card-dark p-5 hover:border-[var(--border)] transition-colors relative">
+    <div className="card-dark p-5 hover:border-neon/40 transition-colors relative group">
       <div className="flex items-start justify-between mb-2 gap-2">
-        <h4 className="font-semibold text-[14px] truncate">{project.name}</h4>
+        <div className="flex items-center gap-3 min-w-0">
+          <div className="w-8 h-8 rounded bg-container border border-border-muted flex items-center justify-center text-secondary flex-shrink-0">
+            <Icon name="schema" size={16} />
+          </div>
+          <h4 className="font-semibold text-[14px] text-primary truncate group-hover:text-neon transition-colors">
+            {project.name}
+          </h4>
+        </div>
         <StatusBadge status={project.status} />
       </div>
 
-      <p className="text-[12px] text-[var(--text-muted)] line-clamp-2 mb-3 min-h-[32px]">
+      <p className="text-[12px] text-secondary line-clamp-2 mb-3 min-h-[32px]">
         {project.description || "Tanpa deskripsi"}
       </p>
 
@@ -79,7 +83,7 @@ export function ProjectCard({ project }: { project: Project }) {
           {project.tags.slice(0, 3).map((t) => (
             <span
               key={t}
-              className="text-[10px] px-2 py-0.5 rounded-full bg-[var(--surface-alt)] border border-[var(--border-soft)] text-[var(--text-muted)]"
+              className="text-[10px] px-2 py-0.5 rounded-full bg-surface-2 border border-border-muted text-secondary"
             >
               #{t}
             </span>
@@ -88,13 +92,13 @@ export function ProjectCard({ project }: { project: Project }) {
       )}
 
       <div className="flex items-center justify-between">
-        <span className="text-[11px] text-[var(--text-dim)] font-mono">
+        <span className="text-[11px] text-dim font-mono">
           {project.nodeCount} perangkat · {date}
         </span>
         <div className="flex items-center gap-1">
           <Link
             href={`/editor/${project.id}`}
-            className="text-[12px] text-[var(--accent)] font-semibold no-underline hover:underline"
+            className="text-[12px] text-neon font-semibold no-underline hover:underline"
           >
             Buka →
           </Link>
@@ -102,10 +106,10 @@ export function ProjectCard({ project }: { project: Project }) {
             <button
               onClick={() => setMenuOpen((v) => !v)}
               disabled={busy}
-              className="w-7 h-7 rounded-lg flex items-center justify-center text-[var(--text-dim)] hover:bg-[var(--surface-alt)] hover:text-[var(--text-primary)] text-sm cursor-pointer"
+              className="w-7 h-7 rounded-lg flex items-center justify-center text-dim hover:bg-high hover:text-primary cursor-pointer disabled:opacity-40"
               aria-label="Aksi proyek"
             >
-              ⋯
+              <Icon name="more" size={17} />
             </button>
             {menuOpen && (
               <div
@@ -115,29 +119,29 @@ export function ProjectCard({ project }: { project: Project }) {
                 <button
                   onClick={() => setStatus(project.status === "completed" ? "draft" : "completed")}
                   disabled={busy}
-                  className="w-full text-left text-[12px] px-3 py-2 rounded-lg hover:bg-[var(--surface-alt)] cursor-pointer"
+                  className="w-full text-left text-[12px] px-3 py-2 rounded-lg hover:bg-high text-secondary hover:text-primary cursor-pointer"
                 >
                   {project.status === "completed" ? "Tandai Draft" : "Tandai Selesai"}
                 </button>
                 <button
                   onClick={() => setStatus("shared")}
                   disabled={busy}
-                  className="w-full text-left text-[12px] px-3 py-2 rounded-lg hover:bg-[var(--surface-alt)] cursor-pointer"
+                  className="w-full text-left text-[12px] px-3 py-2 rounded-lg hover:bg-high text-secondary hover:text-primary cursor-pointer"
                 >
                   Bagikan
                 </button>
                 <button
                   onClick={duplicate}
                   disabled={busy}
-                  className="w-full text-left text-[12px] px-3 py-2 rounded-lg hover:bg-[var(--surface-alt)] cursor-pointer"
+                  className="w-full text-left text-[12px] px-3 py-2 rounded-lg hover:bg-high text-secondary hover:text-primary cursor-pointer"
                 >
                   Duplikat
                 </button>
-                <div className="h-px bg-[var(--border-soft)] my-1" />
+                <div className="h-px bg-border-soft my-1" />
                 <button
                   onClick={remove}
                   disabled={busy}
-                  className="w-full text-left text-[12px] px-3 py-2 rounded-lg hover:bg-red-500/10 hover:text-red-400 text-red-400/90 cursor-pointer"
+                  className="w-full text-left text-[12px] px-3 py-2 rounded-lg hover:bg-red-500/10 text-danger cursor-pointer"
                 >
                   Hapus
                 </button>

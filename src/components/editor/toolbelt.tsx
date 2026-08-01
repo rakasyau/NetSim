@@ -1,13 +1,26 @@
 "use client";
 
 /* ---------------------------------------------------------
- * Toolbelt — palet perangkat di sisi kiri editor.
+ * Toolbelt — floating "Library" perangkat (mockup editor).
  * Drag chip ke canvas untuk menambah node (drag data
  * transfer "application/netsim-device").
  * ------------------------------------------------------- */
 import { DEVICE_CATALOG, TOOLBELT_ORDER } from "@/lib/device-catalog";
 import { useEditorStore } from "@/components/editor/editor-store";
 import { validateTopology } from "@/lib/topology-validation";
+import { Icon } from "@/components/icons";
+
+const TYPE_ICON: Record<string, string> = {
+  router: "router",
+  switch: "hub",
+  server: "dns",
+  pc: "computer",
+  laptop: "computer",
+  ap: "lan",
+  firewall: "router",
+  cloud: "cloud",
+  printer: "print",
+};
 
 export function Toolbelt() {
   const nodes = useEditorStore((s) => s.nodes);
@@ -22,17 +35,14 @@ export function Toolbelt() {
   }
 
   return (
-    <aside className="w-[176px] shrink-0 border-r border-[var(--border-soft)] bg-[var(--surface)] flex flex-col">
-      <div className="px-3.5 py-3 border-b border-[var(--border-soft)]">
-        <h3 className="text-[11px] uppercase tracking-wider font-bold text-[var(--text-dim)]">
-          Perangkat
-        </h3>
-        <p className="text-[10px] text-[var(--text-dim)] mt-0.5">
-          Seret ke kanvas
-        </p>
+    <div className="absolute left-4 top-4 z-20 bg-surface/90 backdrop-blur-md border border-border-muted rounded-lg shadow-lg w-52 flex flex-col">
+      {/* Header */}
+      <div className="p-2 border-b border-border-muted label-caps text-secondary">
+        Library
       </div>
 
-      <div className="flex-1 overflow-y-auto p-2.5 flex flex-col gap-1.5">
+      {/* Devices */}
+      <div className="p-2 flex flex-col gap-0.5 max-h-[420px] overflow-y-auto">
         {TOOLBELT_ORDER.map((t) => {
           const info = DEVICE_CATALOG[t];
           return (
@@ -40,27 +50,25 @@ export function Toolbelt() {
               key={t}
               draggable
               onDragStart={(e) => onDragStart(e, t)}
-              className="flex items-center gap-2.5 px-2.5 py-2 rounded-lg border border-[var(--border-soft)] bg-[var(--surface-alt)]/50 cursor-grab active:cursor-grabbing hover:border-[var(--border-strong)] hover:bg-[var(--surface-alt)] transition-colors select-none"
+              className="flex items-center gap-3 p-2 hover:bg-surface-2 rounded cursor-grab active:cursor-grabbing text-secondary hover:text-neon transition-colors select-none"
               title={`${info.label} (${info.model})`}
             >
               <span
-                className="w-2 h-2 rounded-full shrink-0"
-                style={{ background: info.color, boxShadow: `0 0 6px ${info.color}66` }}
-              />
-              <span className="text-[11.5px] font-medium text-[var(--text-primary)]">
-                {info.label}
+                className="w-7 h-7 rounded-[6px] flex items-center justify-center text-[13px] font-bold shrink-0"
+                style={{ background: `${info.color}22`, color: info.color }}
+              >
+                <Icon name={TYPE_ICON[t] ?? "dns"} size={16} />
               </span>
+              <span className="text-[13px] font-medium">{info.label}</span>
             </div>
           );
         })}
       </div>
 
       {/* Validasi summary */}
-      <div className="border-t border-[var(--border-soft)] px-3.5 py-2.5">
+      <div className="border-t border-border-muted px-3 py-2">
         <div className="flex items-center justify-between">
-          <span className="text-[10px] uppercase tracking-wider font-bold text-[var(--text-dim)]">
-            Validasi
-          </span>
+          <span className="label-caps text-dim text-[10px]">Validasi</span>
           {errors > 0 && (
             <span className="text-[10px] font-bold bg-red-500/15 text-red-400 px-1.5 py-0.5 rounded">
               {errors} error
@@ -78,7 +86,7 @@ export function Toolbelt() {
           )}
         </div>
         {warnings.length > 0 && (
-          <ul className="mt-2 space-y-1">
+          <ul className="mt-1.5 space-y-1">
             {warnings.slice(0, 4).map((w, i) => (
               <li
                 key={i}
@@ -87,18 +95,18 @@ export function Toolbelt() {
                     ? "text-red-400"
                     : w.level === "warning"
                       ? "text-amber-400"
-                      : "text-[var(--text-dim)]"
+                      : "text-dim"
                 }`}
               >
                 {w.level === "error" ? "●" : w.level === "warning" ? "▲" : "○"} {w.message}
               </li>
             ))}
             {warnings.length > 4 && (
-              <li className="text-[10px] text-[var(--text-dim)]">+{warnings.length - 4} lainnya...</li>
+              <li className="text-[10px] text-dim">+{warnings.length - 4} lainnya...</li>
             )}
           </ul>
         )}
       </div>
-    </aside>
+    </div>
   );
 }

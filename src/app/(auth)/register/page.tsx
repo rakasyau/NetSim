@@ -55,11 +55,11 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="w-full max-w-[380px] card-dark p-8">
-      <h1 className="font-[var(--font-manrope)] font-bold text-xl mb-1.5">
+    <div className="w-full max-w-[400px] glass-panel rounded-xl p-8">
+      <h1 className="text-[22px] font-semibold text-primary mb-1.5">
         Buat akun NetSim
       </h1>
-      <p className="text-[13px] text-[var(--text-muted)] mb-6">
+      <p className="text-[13px] text-secondary mb-6">
         Gratis — untuk menyimpan topologi &amp; konfigurasi jaringannya.
       </p>
 
@@ -71,7 +71,7 @@ export default function RegisterPage() {
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <div>
-          <label className="block text-[12px] text-[var(--text-dim)] uppercase tracking-wide font-semibold mb-1.5">
+          <label className="block label-caps text-secondary mb-1.5">
             Nama Lengkap
           </label>
           <input
@@ -85,7 +85,7 @@ export default function RegisterPage() {
         </div>
 
         <div>
-          <label className="block text-[12px] text-[var(--text-dim)] uppercase tracking-wide font-semibold mb-1.5">
+          <label className="block label-caps text-secondary mb-1.5">
             Email
           </label>
           <input
@@ -99,7 +99,7 @@ export default function RegisterPage() {
         </div>
 
         <div>
-          <label className="block text-[12px] text-[var(--text-dim)] uppercase tracking-wide font-semibold mb-1.5">
+          <label className="block label-caps text-secondary mb-1.5">
             Password
           </label>
           <input
@@ -114,8 +114,8 @@ export default function RegisterPage() {
         </div>
 
         <div>
-          <label className="block text-[12px] text-[var(--text-dim)] uppercase tracking-wide font-semibold mb-1.5">
-            Institusi <span className="normal-case text-[var(--text-dim)] font-normal">(opsional)</span>
+          <label className="block label-caps text-secondary mb-1.5">
+            Institusi <span className="normal-case text-dim font-normal">(opsional)</span>
           </label>
           <input
             type="text"
@@ -131,9 +131,9 @@ export default function RegisterPage() {
         </button>
       </form>
 
-      <p className="text-[13px] text-[var(--text-muted)] text-center mt-6">
+      <p className="text-[13px] text-secondary text-center mt-6">
         Sudah punya akun?{" "}
-        <Link href="/login" className="text-[var(--accent)] font-semibold no-underline">
+        <Link href="/login" className="text-neon font-semibold no-underline">
           Masuk
         </Link>
       </p>

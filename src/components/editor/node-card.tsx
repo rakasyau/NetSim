@@ -36,7 +36,7 @@ function NodeCardInner({ data, selected }: NodeProps<FlowNode>) {
           type="target"
           position={Position.Left}
           id={`target-${iface.name}`}
-          className="!w-[7px] !h-[7px] !bg-[var(--border-strong)] !border !border-[var(--surface)] !left-[-8px]"
+          className="!w-[7px] !h-[7px] !bg-border-muted !border !border-surface !left-[-8px]"
           style={{ top: handleTop(i) }}
         />
       ))}
@@ -48,7 +48,7 @@ function NodeCardInner({ data, selected }: NodeProps<FlowNode>) {
           type="source"
           position={Position.Right}
           id={`source-${iface.name}`}
-          className="!w-[7px] !h-[7px] !bg-[var(--border-strong)] !border !border-[var(--surface)] !right-[-8px]"
+          className="!w-[7px] !h-[7px] !bg-border-muted !border !border-surface !right-[-8px]"
           style={{ top: handleTop(i) }}
         />
       ))}
@@ -80,10 +80,10 @@ function NodeCardInner({ data, selected }: NodeProps<FlowNode>) {
               height: ROW_H,
             }}
           >
-            <span className="font-mono text-[10px] text-[var(--text-muted)]">
+            <span className="font-mono text-[10px] text-secondary">
               {iface.name}
             </span>
-            <span className="font-mono text-[10px] text-[var(--text-dim)] truncate">
+            <span className="font-mono text-[10px] text-dim truncate">
               {iface.ip || "—"}
             </span>
           </div>

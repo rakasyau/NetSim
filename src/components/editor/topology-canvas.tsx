@@ -9,7 +9,6 @@
 import { useCallback, useEffect, useRef } from "react";
 import {
   ReactFlow,
-  Background,
   Controls,
   MiniMap,
   ReactFlowProvider,
@@ -41,7 +40,20 @@ function CanvasInner() {
   const save = useEditorStore((s) => s.save);
   const undo = useEditorStore((s) => s.undo);
   const redo = useEditorStore((s) => s.redo);
-  const { screenToFlowPosition, fitView } = useReactFlow();
+  const { screenToFlowPosition, fitView, zoomIn, zoomOut } = useReactFlow();
+
+  /* Zoom dari toolbar editor (event netsim:zoom) */
+  useEffect(() => {
+    const onZoom = (e: Event) => {
+      const delta = (e as CustomEvent<number>).detail;
+      if (typeof delta === "number") {
+        if (delta > 0) void zoomIn({ duration: 120 });
+        else void zoomOut({ duration: 120 });
+      }
+    };
+    window.addEventListener("netsim:zoom", onZoom);
+    return () => window.removeEventListener("netsim:zoom", onZoom);
+  }, [zoomIn, zoomOut]);
 
   /* fitView SEKALI hanya saat LOAD dgn node tersimpan; editor kosong → viewport tetap (drop akurat) */
   const fittedOnce = useRef(false);
@@ -102,7 +114,7 @@ function CanvasInner() {
         target: conn.target,
         sourceHandle: conn.sourceHandle,
         targetHandle: conn.targetHandle,
-        style: { stroke: "#3E4451", strokeWidth: 2 },
+        style: { stroke: "#4A5468", strokeWidth: 2 },
       };
       addEdge(edge);
     },
@@ -145,12 +157,12 @@ function CanvasInner() {
   /* ---------- Save state pill ---------- */
   const pill =
     saveState === "saving"
-      ? { text: "Menyimpan...", cls: "text-amber-400 bg-amber-500/10" }
+      ? { text: "Menyimpan...", cls: "text-amber-400 bg-amber-500/10 border-amber-500/20" }
       : saveState === "error"
-        ? { text: "Gagal menyimpan", cls: "text-red-400 bg-red-500/10" }
+        ? { text: "Gagal menyimpan", cls: "text-red-400 bg-red-500/10 border-red-500/20" }
         : saveState === "dirty"
-          ? { text: "Belum disimpan", cls: "text-[var(--text-muted)] bg-[var(--surface-alt)]" }
-          : { text: "✓ Tersimpan otomatis", cls: "text-emerald-400 bg-emerald-500/10" };
+          ? { text: "Belum disimpan", cls: "text-secondary bg-surface/80 border-border-muted" }
+          : { text: "✓ Tersimpan otomatis", cls: "text-emerald-400 bg-emerald-500/10 border-emerald-500/20" };
 
   return (
     <div className="relative flex-1 min-w-0 h-full">
@@ -179,14 +191,13 @@ function CanvasInner() {
         maxZoom={2.5}
         proOptions={{ hideAttribution: true }}
         colorMode="dark"
-        className="bg-[#14161C]"
+        onMoveEnd={(e) => {
+          const zoom = (e as unknown as { zoom?: number }).zoom ?? 1;
+          window.dispatchEvent(new CustomEvent("netsim:zoomchange", { detail: zoom }));
+        }}
+        className="grid-bg bg-bg"
       >
-        <Background gap={16} size={1} color="#23262E" />
-        <Controls
-          position="bottom-left"
-          showInteractive={false}
-          className="!shadow-lg !rounded-lg !overflow-hidden !border !border-[var(--border-soft)] !bg-[var(--surface)]"
-        />
+        <Controls position="bottom-left" showInteractive={false} />
         <MiniMap
           position="bottom-right"
           pannable
@@ -202,20 +213,19 @@ function CanvasInner() {
             };
             return colors[d.vendor ?? "generic"] ?? "#F2F3F5";
           }}
-          className="!bg-[var(--surface)] !border !border-[var(--border-soft)] !rounded-lg"
         />
       </ReactFlow>
 
       {/* Status pill */}
       <div
-        className={`absolute top-3 left-1/2 -translate-x-1/2 z-10 text-[11px] font-semibold px-3 py-1.5 rounded-full border border-[var(--border-soft)] backdrop-blur ${pill.cls}`}
+        className={`absolute top-4 left-1/2 -translate-x-1/2 z-10 text-[11px] font-semibold px-3 py-1.5 rounded-full border backdrop-blur ${pill.cls}`}
       >
         {pill.text}
       </div>
 
       {/* Hint */}
-      <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-10 text-[10px] text-[var(--text-dim)] bg-[var(--surface)]/80 backdrop-blur px-3 py-1 rounded-full border border-[var(--border-soft)] pointer-events-none">
-        Ctrl+Z undo · Ctrl+Y redo · Del hapus · seret dari toolbelt untuk tambah perangkat
+      <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-10 text-[10px] text-dim bg-surface/80 backdrop-blur px-3 py-1 rounded-full border border-border-muted pointer-events-none">
+        Ctrl+Z undo · Ctrl+Y redo · Del hapus · seret dari Library untuk tambah perangkat
       </div>
     </div>
   );

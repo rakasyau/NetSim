@@ -1,36 +1,67 @@
 @import "tailwindcss";
 
 /* ============================================================
-   NetSim — Tema dark charcoal + aksen hijau neon #C6FF3D
-   (mengikuti referensi UI UX.jpg & netsim_editor_mockup.html)
+   NetSim — Design System "CyberNet Modern"
+   (bahan/stitch_netsim_ui_ux_design/cybernet_modern/DESIGN.md)
+   Obsidian dark + neon #C3F400, Inter + JetBrains Mono
    ============================================================ */
 :root {
-  --bg: #0A0B0D;
-  --surface: #16171B;
-  --surface-alt: #1D1F24;
-  --border: #2A2C32;
-  --border-soft: #202226;
-  --text-primary: #F2F3F5;
-  --text-muted: #8B8D95;
-  --text-dim: #57585F;
-  --accent: #C6FF3D;
-  --accent-dim: rgba(198, 255, 61, 0.14);
-  --mikrotik: #E8734A;
-  --cisco: #4AA8E8;
-  --linux: #B08CFF;
+  /* Foundation */
+  --bg: #0b0e11;            /* surface-container-lowest */
+  --surface: #15191c;       /* surface-main */
+  --surface-2: #1e2329;     /* surface-accent */
+  --surface-container: #1d2023;
+  --surface-high: #323538;  /* hover */
+  --border-muted: #2d3748;
+  --border-soft: #232b36;
+
+  /* Text */
+  --text-primary: #ffffff;
+  --text-secondary: #94a3b8;
+  --text-dim: #5d6675;
+
+  /* Accent */
+  --neon: #c3f400;
+  --neon-2: #ccff00;
+  --on-neon: #161e00;
+  --neon-glow: rgba(195, 244, 0, 0.35);
+  --neon-dim: rgba(195, 244, 0, 0.12);
+
+  /* Semantic */
+  --emerald: #6ffbbe;
+  --danger: #ef4444;
+  --amber: #f5c542;
+
+  /* Vendor */
+  --mikrotik: #e8734a;
+  --cisco: #4aa8e8;
+  --linux: #b08cff;
 }
 
 @theme inline {
-  --color-background: var(--bg);
-  --color-foreground: var(--text-primary);
+  --color-bg: var(--bg);
   --color-surface: var(--surface);
-  --color-surface-alt: var(--surface-alt);
+  --color-surface-2: var(--surface-2);
+  --color-container: var(--surface-container);
+  --color-high: var(--surface-high);
+  --color-border-muted: var(--border-muted);
   --color-border-soft: var(--border-soft);
-  --color-accent: var(--accent);
-  --color-muted: var(--text-muted);
+  --color-primary: var(--text-primary);
+  --color-secondary: var(--text-secondary);
   --color-dim: var(--text-dim);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-neon: var(--neon);
+  --color-neon-2: var(--neon-2);
+  --color-on-neon: var(--on-neon);
+  --color-emerald: var(--emerald);
+  --color-danger: var(--danger);
+  --color-amber: var(--amber);
+  --color-mikrotik: var(--mikrotik);
+  --color-cisco: var(--cisco);
+  --color-linux: var(--linux);
+  --font-sans: var(--font-inter), system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains), ui-monospace, monospace;
+  --radius-lg: 0.5rem;
+  --radius-xl: 0.75rem;
 }
 
 html {
@@ -40,30 +71,101 @@ html {
 body {
   background: var(--bg);
   color: var(--text-primary);
-  font-family: var(--font-geist-sans), system-ui, sans-serif;
+  font-family: var(--font-inter), system-ui, sans-serif;
+  font-size: 14px;
 }
 
-/* Utility kecil ala mockup */
-.text-muted { color: var(--text-muted); }
-.text-dim { color: var(--text-dim); }
+::selection {
+  background: rgba(195, 244, 0, 0.25);
+}
 
+/* ---------- Scrollbar CyberNet (dari mockup AI assistant) ---------- */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #111417;
+}
+::-webkit-scrollbar-thumb {
+  background: #2d3748;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #42474e;
+}
+
+/* ---------- Glass & efek ---------- */
+.glass-panel {
+  background: rgba(21, 25, 28, 0.6);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--border-muted);
+}
+
+.text-glow {
+  text-shadow: 0 0 10px rgba(204, 255, 0, 0.5);
+}
+
+.grid-bg {
+  background-size: 40px 40px;
+  background-image: linear-gradient(to right, rgba(45, 55, 72, 0.2) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(45, 55, 72, 0.2) 1px, transparent 1px);
+}
+
+/* ---------- Label caps (section header) ---------- */
+.label-caps {
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 16px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+/* ---------- Input ---------- */
 .input-dark {
   width: 100%;
-  background: var(--surface-alt);
-  border: 1px solid var(--border-soft);
-  border-radius: 8px;
-  padding: 10px 12px;
+  background: var(--bg);
+  border: 1px solid var(--border-muted);
+  border-radius: 0.5rem;
+  padding: 9px 12px;
   color: var(--text-primary);
   font-size: 14px;
   outline: none;
-  transition: border-color 0.15s ease;
-}
-.input-dark:focus {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px var(--accent-dim);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 .input-dark::placeholder {
   color: var(--text-dim);
+}
+.input-dark:focus {
+  border-color: var(--neon);
+  box-shadow: 0 0 0 3px var(--neon-dim);
+}
+
+/* ---------- Buttons ---------- */
+.btn-accent {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 9px 18px;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  border: none;
+  background: var(--neon);
+  color: var(--on-neon);
+  transition: background 0.15s ease, box-shadow 0.15s ease;
+  box-shadow: 0 4px 12px rgba(195, 244, 0, 0.15);
+}
+.btn-accent:hover {
+  background: var(--neon-2);
+  box-shadow: 0 6px 18px rgba(195, 244, 0, 0.25);
+}
+.btn-accent:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .btn-dark {
@@ -71,56 +173,40 @@ body {
   align-items: center;
   justify-content: center;
   gap: 8px;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 600;
-  padding: 10px 18px;
-  border-radius: 9px;
+  padding: 9px 18px;
+  border-radius: 0.5rem;
   cursor: pointer;
-  border: 1px solid var(--border);
-  background: var(--surface-alt);
+  border: 1px solid var(--border-muted);
+  background: var(--surface-2);
   color: var(--text-primary);
   transition: background 0.15s ease, border-color 0.15s ease;
 }
-.btn-dark:hover { background: #24262c; }
-
-.btn-accent {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  font-size: 14px;
-  font-weight: 700;
-  padding: 10px 18px;
-  border-radius: 9px;
-  cursor: pointer;
-  border: none;
-  background: var(--accent);
-  color: #0A0B0D;
-  transition: filter 0.15s ease;
+.btn-dark:hover {
+  background: var(--surface-high);
 }
-.btn-accent:hover { filter: brightness(1.08); }
-.btn-accent:disabled { opacity: 0.5; cursor: not-allowed; }
 
 .card-dark {
   background: var(--surface);
-  border: 1px solid var(--border-soft);
-  border-radius: 12px;
+  border: 1px solid var(--border-muted);
+  border-radius: 0.75rem;
 }
 
-/* ---------- Editor: node card (porting mockup) ---------- */
+/* ---------- Editor: node card (CyberNet) ---------- */
 .netsim-node {
-  background: #1C1E24;
-  border: 1.5px solid var(--border-soft);
+  background: var(--surface);
+  border: 1.5px solid var(--border-muted);
   border-radius: 12px;
   padding: 0;
   width: 172px;
   position: relative;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 .netsim-node-selected {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(198, 255, 61, 0.14), 0 6px 20px rgba(0, 0, 0, 0.45);
+  border-color: var(--neon);
+  box-shadow: 0 0 0 3px rgba(195, 244, 0, 0.14), 0 6px 20px rgba(0, 0, 0, 0.45);
 }
 .netsim-node .react-flow__handle {
   z-index: 5;
@@ -179,7 +265,7 @@ body {
 }
 .netsim-node .node-iface span:first-child {
   font-size: 9.5px;
-  color: var(--text-muted);
+  color: var(--text-secondary);
   letter-spacing: 0.2px;
 }
 .netsim-node .node-iface span:last-child {
@@ -190,4 +276,40 @@ body {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+/* ---------- React Flow theming (CyberNet) ---------- */
+.react-flow__controls {
+  border-radius: 0.75rem;
+  overflow: hidden;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+}
+.react-flow__controls button {
+  background: var(--surface) !important;
+  border-bottom: 1px solid var(--border-muted) !important;
+  color: var(--text-secondary) !important;
+}
+.react-flow__controls button:hover {
+  background: var(--surface-2) !important;
+  color: var(--neon) !important;
+}
+.react-flow__controls button svg {
+  fill: currentColor;
+}
+.react-flow__minimap {
+  border-radius: 0.75rem;
+  border: 1px solid var(--border-muted);
+  overflow: hidden;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+}
+.react-flow__edge-path {
+  stroke: #4a5468;
+  stroke-width: 1.8;
+}
+.react-flow__edge.selected .react-flow__edge-path {
+  stroke: var(--neon);
+}
+.react-flow__handle {
+  background: var(--surface-2);
+  border: 1.5px solid var(--neon);
 }

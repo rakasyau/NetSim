@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ProjectCard } from "@/components/project-card";
 import { CreateProjectDialog } from "@/components/create-project-dialog";
+import { Icon } from "@/components/icons";
 
 /* ---------------------------------------------------------
  * ProjectList — daftar proyek dengan search & filter
@@ -48,8 +49,11 @@ export function ProjectList({ initialProjects }: { initialProjects: Project[] })
   return (
     <>
       {/* Toolbar: search + filter */}
-      <div className="flex items-center gap-3 mb-5">
+      <div className="flex items-center gap-3 mb-5 flex-wrap">
         <div className="relative flex-1 max-w-[340px]">
+          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-secondary pointer-events-none">
+            <Icon name="search" size={17} />
+          </span>
           <input
             type="search"
             className="input-dark pl-9"
@@ -57,12 +61,9 @@ export function ProjectList({ initialProjects }: { initialProjects: Project[] })
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
-          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-dim)] text-sm pointer-events-none">
-            ⌕
-          </span>
         </div>
 
-        <div className="flex items-center gap-1 bg-[var(--surface)] border border-[var(--border-soft)] rounded-[9px] p-1">
+        <div className="flex items-center gap-1 bg-surface border border-border-muted rounded-lg p-1">
           {[
             { v: "", label: "Semua" },
             { v: "draft", label: "Draft" },
@@ -72,10 +73,10 @@ export function ProjectList({ initialProjects }: { initialProjects: Project[] })
             <button
               key={f.v}
               onClick={() => setStatus(f.v)}
-              className={`text-[12px] px-3 py-1.5 rounded-[7px] cursor-pointer transition-colors ${
+              className={`text-[12px] px-3 py-1.5 rounded-md cursor-pointer transition-colors ${
                 status === f.v
-                  ? "bg-[var(--accent-dim)] text-[var(--accent)] font-semibold"
-                  : "text-[var(--text-muted)] hover:text-[var(--text-primary)]"
+                  ? "bg-surface-2 text-neon font-semibold"
+                  : "text-secondary hover:text-primary"
               }`}
             >
               {f.label}
@@ -86,36 +87,38 @@ export function ProjectList({ initialProjects }: { initialProjects: Project[] })
         <div className="flex-1" />
 
         <button className="btn-accent text-[13px]" onClick={() => setDialogOpen(true)}>
-          + Buat Proyek
+          <Icon name="add" size={16} />
+          Buat Proyek
         </button>
       </div>
 
       {loading && projects.length === 0 && (
-        <div className="card-dark p-10 text-center text-[13px] text-[var(--text-muted)]">
+        <div className="card-dark p-10 text-center text-[13px] text-secondary">
           Memuat proyek...
         </div>
       )}
 
       {!loading && projects.length === 0 && (
         <div className="card-dark p-10 text-center">
-          <p className="text-[15px] font-semibold mb-1">
+          <p className="text-[15px] font-semibold mb-1 text-primary">
             {search || status ? "Tidak ada hasil" : "Belum ada proyek"}
           </p>
-          <p className="text-[13px] text-[var(--text-muted)] mb-5">
+          <p className="text-[13px] text-secondary mb-5">
             {search || status
               ? "Coba ubah kata kunci atau filter."
               : "Buat proyek pertamamu untuk mulai merancang topologi jaringan."}
           </p>
           {!search && !status && (
             <button className="btn-accent text-[13px]" onClick={() => setDialogOpen(true)}>
-              + Buat Proyek Pertama
+              <Icon name="add" size={16} />
+              Buat Proyek Pertama
             </button>
           )}
         </div>
       )}
 
       {projects.length > 0 && (
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
           {projects.map((p) => (
             <ProjectCard key={p.id} project={p} />
           ))}

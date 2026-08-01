@@ -55,8 +55,8 @@ export function CreateProjectDialog({
         className="card-dark w-full max-w-[420px] p-6"
         onClick={(e) => e.stopPropagation()}
       >
-        <h3 className="font-[var(--font-manrope)] font-bold text-lg mb-1">Buat Proyek Baru</h3>
-        <p className="text-[13px] text-[var(--text-muted)] mb-5">
+        <h3 className="text-[18px] font-semibold text-primary mb-1">Buat Proyek Baru</h3>
+        <p className="text-[13px] text-secondary mb-5">
           Mulai rancang topologi jaringan dari kanvas kosong.
         </p>
 
@@ -68,7 +68,7 @@ export function CreateProjectDialog({
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <div>
-            <label className="block text-[12px] text-[var(--text-dim)] uppercase tracking-wide font-semibold mb-1.5">
+            <label className="block label-caps text-secondary mb-1.5">
               Nama Proyek
             </label>
             <input
@@ -83,8 +83,8 @@ export function CreateProjectDialog({
           </div>
 
           <div>
-            <label className="block text-[12px] text-[var(--text-dim)] uppercase tracking-wide font-semibold mb-1.5">
-              Deskripsi <span className="normal-case text-[var(--text-dim)] font-normal">(opsional)</span>
+            <label className="block label-caps text-secondary mb-1.5">
+              Deskripsi <span className="normal-case text-dim font-normal">(opsional)</span>
             </label>
             <textarea
               className="input-dark min-h-[80px] resize-y"

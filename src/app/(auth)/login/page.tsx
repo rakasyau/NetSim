@@ -38,11 +38,11 @@ function LoginForm() {
   }
 
   return (
-    <div className="w-full max-w-[380px] card-dark p-8">
-      <h1 className="font-[var(--font-manrope)] font-bold text-xl mb-1.5">
+    <div className="w-full max-w-[400px] glass-panel rounded-xl p-8">
+      <h1 className="text-[22px] font-semibold text-primary mb-1.5">
         Masuk ke NetSim
       </h1>
-      <p className="text-[13px] text-[var(--text-muted)] mb-6">
+      <p className="text-[13px] text-secondary mb-6">
         Lanjutkan simulasi topologi jaringanmu.
       </p>
 
@@ -54,7 +54,7 @@ function LoginForm() {
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <div>
-          <label className="block text-[12px] text-[var(--text-dim)] uppercase tracking-wide font-semibold mb-1.5">
+          <label className="block label-caps text-secondary mb-1.5">
             Email
           </label>
           <input
@@ -68,7 +68,7 @@ function LoginForm() {
         </div>
 
         <div>
-          <label className="block text-[12px] text-[var(--text-dim)] uppercase tracking-wide font-semibold mb-1.5">
+          <label className="block label-caps text-secondary mb-1.5">
             Password
           </label>
           <input
@@ -86,9 +86,9 @@ function LoginForm() {
         </button>
       </form>
 
-      <p className="text-[13px] text-[var(--text-muted)] text-center mt-6">
+      <p className="text-[13px] text-secondary text-center mt-6">
         Belum punya akun?{" "}
-        <Link href="/register" className="text-[var(--accent)] font-semibold no-underline">
+        <Link href="/register" className="text-neon font-semibold no-underline">
           Daftar
         </Link>
       </p>
