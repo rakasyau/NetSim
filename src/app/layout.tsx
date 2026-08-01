@@ -13,9 +13,32 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "NetSim — Simulasi & Konfigurasi Jaringan",
+  title: {
+    default: "NetSim — Simulasi & Konfigurasi Jaringan",
+    template: "%s · NetSim",
+  },
   description:
     "Platform simulasi dan konfigurasi topologi jaringan berbasis AI: buat topologi, generate config Mikrotik/Cisco/Linux, dan tanya AI.",
+  keywords: [
+    "NetSim",
+    "simulasi jaringan",
+    "topologi",
+    "Mikrotik",
+    "Cisco",
+    "RouterOS",
+    "netplan",
+    "konfigurasi jaringan",
+  ],
+  applicationName: "NetSim Pro",
+  authors: [{ name: "Raka Syauqi" }],
+  openGraph: {
+    title: "NetSim — Simulasi & Konfigurasi Jaringan",
+    description:
+      "Desain topologi jaringan, generate config Mikrotik/Cisco/Linux dengan AI, dan ekspor konfigurasi.",
+    type: "website",
+    locale: "id_ID",
+  },
+  icons: { icon: "/icon.svg" },
 };
 
 export default function RootLayout({
