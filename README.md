@@ -1,36 +1,61 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# NetSim — Simulasi & Konfigurasi Jaringan
 
-## Getting Started
+> 🌐 **Live di [https://netsim.rakasyau.my.id](https://netsim.rakasyau.my.id)**
 
-First, run the development server:
+**NetSim** adalah aplikasi web simulator topologi jaringan yang berjalan langsung di browser. Kamu bisa membangun topologi jaringan secara visual — router, switch, server, PC, dan perangkat lainnya — lalu mengonfigurasinya dengan script CLI sungguhan (RouterOS, Cisco IOS, netplan) dan dibantu AI. Cocok untuk belajar jaringan, latihan konfigurasi, atau sekadar eksperimen topologi tanpa perlu perangkat fisik.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+Tanpa instalasi: cukup buka situsnya, daftar akun gratis, dan mulai membangun jaringan pertamamu.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Fitur Utama
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### 🖥️ Editor Topologi Visual
+- **9 tipe perangkat**: Router Mikrotik (RB4011), Switch Cisco (2960), Server Linux (Ubuntu 24.04), PC, Laptop, Access Point, Firewall (CCR2004), Cloud/Internet, dan Printer.
+- Seret & lepas perangkat dari library ke kanvas, sambungkan dengan kabel, geser, zoom, dan pan dengan bebas (snap grid, minimap).
+- Hostname perangkat otomatis (RB-1, RB-2, …) — tinggal atur IP tiap interface.
+- Auto-save, undo/redo (Ctrl+Z / Ctrl+Y), hapus cepat (Del).
 
-## Learn More
+### ⚙️ Konfigurasi Perangkat
+- Template cepat: **DHCP Server**, **NAT Masquerade**, **OSPF Single Area**, **Static Route**, dan **VLAN di Bridge** — sekali klik, script siap.
+- Editor script RouterOS dengan linting sintaks (`Ctrl+Enter` untuk menyimpan).
+- Validasi otomatis: mendeteksi masalah seperti interface tanpa IP dan menampilkan ringkasannya langsung di panel.
 
-To learn more about Next.js, take a look at the following resources:
+### 🤖 AI Assistant (Google Gemini)
+- **Chat AI**: tanya konsep jaringan apa pun dengan konteks topologi yang sedang kamu kerjakan.
+- **Buat Topologi**: deskripsikan jaringanmu, AI menyusun topologinya.
+- **Generate Config**: buat script CLI (RouterOS / Cisco IOS / netplan) untuk tiap perangkat sesuai vendor & IP yang sudah diatur.
+- Kuota AI harian (20 permintaan) dengan indikator sisa kuota.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### 📁 Manajemen Proyek
+- Dashboard ringkasan: jumlah proyek, perangkat tersimpan, aktivitas terakhir, dan pencarian proyek.
+- Status proyek (Draft / Selesai / Dibagikan), filter vendor, duplikat, dan hapus proyek.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### 📤 Ekspor
+- **PNG** — gambar topologi, **ZIP** — kumpulan script konfigurasi, **JSON** — data topologi.
 
-## Deploy on Vercel
+### 🔐 Akun
+- Registrasi gratis (nama, email, institusi). Email bersifat tetap; profil bisa diperbarui kapan saja.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+---
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Cara Menggunakan
+
+1. Buka [netsim.rakasyau.my.id](https://netsim.rakasyau.my.id) dan **daftar** akun gratis.
+2. Dari dashboard, klik **Buat Proyek** — beri nama dan deskripsi, lalu buka editor.
+3. **Seret perangkat** dari library ke kanvas dan sambungkan antar perangkat.
+4. Atur IP di panel properti, atau pakai template config / AI untuk membuat script.
+5. Simpan otomatis setiap perubahan — ekspor topologi & config kapan pun dibutuhkan.
+
+---
+
+## Teknologi
+
+Dibangun dengan **Next.js 16** (App Router), **React 19**, **Tailwind CSS 4**, dan **React Flow** untuk kanvas editor. Data disimpan di **MongoDB Atlas**, autentikasi memakai **NextAuth v5** (JWT), dan fitur AI ditenagai **Google Gemini**. Di-deploy di **Vercel** dengan domain & DNS melalui **Cloudflare**.
+
+---
+
+## Tautan
+
+- 🌐 Website: [https://netsim.rakasyau.my.id](https://netsim.rakasyau.my.id)
+- 📦 Repositori: [github.com/rakasyau/NetSim](https://github.com/rakasyau/NetSim)
