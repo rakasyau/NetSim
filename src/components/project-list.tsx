@@ -56,7 +56,8 @@ export function ProjectList({ initialProjects }: { initialProjects: Project[] })
           </span>
           <input
             type="search"
-            className="input-dark pl-9"
+            className="input-dark"
+            style={{ paddingLeft: "2.25rem" }}
             placeholder="Cari proyek..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}

@@ -154,15 +154,7 @@ function CanvasInner() {
     return () => window.removeEventListener("keydown", handler);
   }, [undo, redo]);
 
-  /* ---------- Save state pill ---------- */
-  const pill =
-    saveState === "saving"
-      ? { text: "Menyimpan...", cls: "text-amber-400 bg-amber-500/10 border-amber-500/20" }
-      : saveState === "error"
-        ? { text: "Gagal menyimpan", cls: "text-red-400 bg-red-500/10 border-red-500/20" }
-        : saveState === "dirty"
-          ? { text: "Belum disimpan", cls: "text-secondary bg-surface/80 border-border-muted" }
-          : { text: "✓ Tersimpan otomatis", cls: "text-emerald-400 bg-emerald-500/10 border-emerald-500/20" };
+  /* ---------- Save state: ditampilkan di topbar (editor-client) ---------- */
 
   return (
     <div className="relative flex-1 min-w-0 h-full">
@@ -215,13 +207,6 @@ function CanvasInner() {
           }}
         />
       </ReactFlow>
-
-      {/* Status pill */}
-      <div
-        className={`absolute top-4 left-1/2 -translate-x-1/2 z-10 text-[11px] font-semibold px-3 py-1.5 rounded-full border backdrop-blur ${pill.cls}`}
-      >
-        {pill.text}
-      </div>
 
       {/* Hint */}
       <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-10 text-[10px] text-dim bg-surface/80 backdrop-blur px-3 py-1 rounded-full border border-border-muted pointer-events-none">

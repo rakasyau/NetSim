@@ -35,7 +35,7 @@ export function Toolbelt() {
   }
 
   return (
-    <div className="absolute left-4 top-4 z-20 bg-surface/90 backdrop-blur-md border border-border-muted rounded-lg shadow-lg w-52 flex flex-col">
+    <div className="absolute left-4 top-4 z-20 bg-surface/90 backdrop-blur-md border border-border-muted rounded-lg shadow-lg w-52 flex flex-col max-h-[calc(100%-2rem)] overflow-y-auto">
       {/* Header */}
       <div className="p-2 border-b border-border-muted label-caps text-secondary">
         Library

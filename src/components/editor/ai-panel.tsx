@@ -386,7 +386,7 @@ function ConfigMode({
       <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-3">
         <div className="bg-surface-2 border border-border-muted rounded-lg p-3 text-[12.5px] text-secondary leading-relaxed">
           Generate script konfigurasi CLI (RouterOS / Cisco IOS / netplan) untuk{" "}
-          <span className="text-primary font-semibold">{nodes.length} perangkat</span> di
+          <span className="text-primary font-semibold">{nodes.length} perangkat</span> di{" "}
           topologi ini — sesuai vendor &amp; IP yang sudah kamu set.
         </div>
 

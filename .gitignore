@@ -45,3 +45,6 @@ bahan/KEY.txt
 next-env.d.ts
 
 .vercel
+
+# agent local output
+.hermes/

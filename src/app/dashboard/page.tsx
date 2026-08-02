@@ -125,7 +125,7 @@ export default async function DashboardPage() {
               <Icon name="history" size={56} className="text-neon" />
             </div>
             <p className="label-caps text-secondary mb-2">Aktivitas Terakhir</p>
-            <div className="flex flex-col gap-3 mt-2">
+            <div className="flex flex-col gap-3 mt-2 pr-16">
               {recent.length === 0 && (
                 <p className="text-[13px] text-dim">Belum ada aktivitas.</p>
               )}
