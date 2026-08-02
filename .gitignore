@@ -32,7 +32,7 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
-!.env.example
+
 
 # kredensial NetSim (jangan pernah commit)
 bahan/KEY.txt
@@ -48,3 +48,6 @@ next-env.d.ts
 
 # agent local output
 .hermes/
+
+# bahan (dokumen & kredensial internal)
+/bahan/
